@@ -6,12 +6,12 @@
 <link rel="apple-touch-icon" href="./Product_PMail.png">
 <link rel="apple-touch-icon" sizes="180x180" href="./Product_PMail.png">
 
-
   <meta charset="UTF-8" />
   <title>PMail - PM 發信小幫手</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
   <style>
-    /* ===== 基本版型設定 ===== */
+    /* ===== 基本版型設定（Mobile First） ===== */
     * {
       box-sizing: border-box;
     }
@@ -22,47 +22,45 @@
         "Noto Sans TC", "Microsoft JhengHei", sans-serif;
       background: #f5f7fb;
       color: #333;
+      font-size: 15px;
+      line-height: 1.5;
     }
 
     .app-container {
-      max-width: 960px;
-      margin: 40px auto;
-      padding: 24px;
+      max-width: 600px;              /* 手機為主，也適合小螢幕 */
+      margin: 12px auto 20px;
+      padding: 16px 14px 20px;
       background: #ffffff;
-      border-radius: 16px;
-      box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
+      border-radius: 12px;
+      box-shadow: 0 6px 18px rgba(15, 23, 42, 0.08);
     }
 
     h1 {
       margin: 0 0 4px;
-      font-size: 28px;
+      font-size: 22px;
       font-weight: 700;
-      letter-spacing: 0.04em;
+      letter-spacing: 0.03em;
       color: #1f2933;
     }
 
     .subtitle {
-      margin-bottom: 24px;
+      margin-bottom: 16px;
       color: #6b7280;
-      font-size: 14px;
+      font-size: 13px;
     }
 
-    /* ===== 表單區塊 ===== */
+    /* ===== 表單區塊：改為單欄垂直排版 ===== */
     .form-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 16px 24px;
-      margin-bottom: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      margin-bottom: 16px;
     }
 
     .form-group {
       display: flex;
       flex-direction: column;
       gap: 6px;
-    }
-
-    .form-group.full {
-      grid-column: 1 / -1; /* 佔滿整列 */
     }
 
     label {
@@ -80,18 +78,19 @@
 
     input[type="text"],
     textarea {
-      border-radius: 8px;
+      border-radius: 10px;
       border: 1px solid #d1d5db;
-      padding: 8px 10px;
-      font-size: 13px;
+      padding: 10px 11px;
+      font-size: 14px;
       transition: border-color 0.15s ease, box-shadow 0.15s ease;
       font-family: inherit;
       resize: vertical;
-      min-height: 38px;
+      min-height: 42px;
+      background-color: #f9fafb;
     }
 
     textarea {
-      min-height: 80px;
+      min-height: 90px;
       line-height: 1.5;
     }
 
@@ -100,30 +99,44 @@
       outline: none;
       border-color: #2563eb;
       box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.15);
+      background-color: #ffffff;
     }
 
     input::placeholder,
     textarea::placeholder {
       color: #9ca3af;
-      font-size: 12px;
+      font-size: 13px;
     }
 
-    /* ===== 按鈕區 ===== */
+    /* ===== 區段標題（讓手機使用者更有段落感） ===== */
+    .section-title {
+      margin-top: 6px;
+      margin-bottom: 4px;
+      font-size: 12px;
+      font-weight: 700;
+      color: #9ca3af;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    /* ===== 按鈕區（Mobile 友善） ===== */
     .actions {
-      display: flex;
-      gap: 12px;
-      margin-bottom: 24px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin: 10px 0 18px;
     }
 
     button {
       border: none;
       border-radius: 999px;
-      padding: 10px 18px;
-      font-size: 13px;
+      padding: 10px 14px;
+      font-size: 14px;
       font-weight: 600;
       cursor: pointer;
       display: inline-flex;
       align-items: center;
+      justify-content: center;
       gap: 6px;
       transition: transform 0.08s ease, box-shadow 0.08s ease,
         background-color 0.12s ease;
@@ -132,13 +145,13 @@
     button.primary {
       background: #2563eb;
       color: #ffffff;
-      box-shadow: 0 6px 16px rgba(37, 99, 235, 0.25);
+      box-shadow: 0 5px 14px rgba(37, 99, 235, 0.25);
     }
 
     button.primary:hover {
       background: #1d4ed8;
       transform: translateY(-1px);
-      box-shadow: 0 10px 24px rgba(37, 99, 235, 0.28);
+      box-shadow: 0 8px 20px rgba(37, 99, 235, 0.3);
     }
 
     button.secondary {
@@ -157,41 +170,41 @@
 
     /* ===== 輸出區塊 ===== */
     .output-card {
-      border-radius: 14px;
+      border-radius: 12px;
       border: 1px solid #e5e7eb;
       background: #f9fafb;
-      padding: 16px 16px 20px;
+      padding: 12px 10px 14px;
     }
 
     .output-header {
       font-size: 13px;
       font-weight: 600;
-      margin-bottom: 8px;
+      margin-bottom: 6px;
       color: #111827;
     }
 
     .output-subject {
       font-family: "SFMono-Regular", ui-monospace, Menlo, Monaco, Consolas,
         "Liberation Mono", "Courier New", monospace;
-      font-size: 12px;
+      font-size: 11px;
       padding: 6px 8px;
-      border-radius: 8px;
+      border-radius: 7px;
       background: #111827;
       color: #f9fafb;
       overflow-x: auto;
       white-space: nowrap;
-      margin-bottom: 12px;
+      margin-bottom: 8px;
     }
 
     .output-body {
-      white-space: pre-wrap; /* 讓 \n 正確換行 */
+      white-space: pre-wrap;
       font-size: 13px;
       line-height: 1.6;
       background: #ffffff;
-      border-radius: 10px;
-      padding: 12px 14px;
+      border-radius: 8px;
+      padding: 10px 10px;
       border: 1px solid #e5e7eb;
-      max-height: 420px;
+      max-height: 360px;
       overflow-y: auto;
     }
 
@@ -203,17 +216,26 @@
 
     .output-toolbar {
       display: flex;
-      justify-content: flex-end;
-      margin-top: 10px;
+      flex-direction: column;
+      gap: 6px;
+      margin-top: 8px;
     }
 
     .copy-hint {
       font-size: 11px;
       color: #6b7280;
-      margin-right: auto;
       display: flex;
       align-items: center;
       gap: 4px;
+    }
+
+    .copy-btn-row {
+      display: flex;
+      justify-content: flex-end;
+    }
+
+    .copy-btn-row button {
+      min-width: 120px;
     }
 
     .status-text {
@@ -221,21 +243,39 @@
       color: #16a34a;
       opacity: 0;
       transition: opacity 0.2s ease;
+      text-align: right;
     }
 
     .status-text.visible {
       opacity: 1;
     }
 
-    /* ===== RWD 調整 ===== */
-    @media (max-width: 768px) {
+    /* ===== Desktop 以上再加一點寬度優化 ===== */
+    @media (min-width: 768px) {
       .app-container {
-        margin: 16px;
-        padding: 16px;
+        margin-top: 24px;
+        padding: 20px 22px 24px;
       }
 
       .form-grid {
-        grid-template-columns: 1fr;
+        gap: 16px;
+      }
+
+      .output-body {
+        max-height: 420px;
+      }
+
+      .output-toolbar {
+        flex-direction: row;
+        align-items: center;
+      }
+
+      .copy-hint {
+        margin-right: auto;
+      }
+
+      .status-text {
+        min-width: 120px;
       }
     }
   </style>
@@ -248,6 +288,8 @@
 
     <!-- ===== 輸入區：基本資訊與專案內容 ===== -->
     <div class="form-grid">
+      <div class="section-title">基本資訊</div>
+
       <!-- 專案名稱 -->
       <div class="form-group">
         <label for="projectName">
@@ -274,8 +316,10 @@
         />
       </div>
 
+      <div class="section-title">本週進度說明</div>
+
       <!-- 本週進度摘要 -->
-      <div class="form-group full">
+      <div class="form-group">
         <label for="summary">
           專案進度摘要
           <span class="hint">（一至兩段，說明整體狀態）</span>
@@ -286,8 +330,10 @@
         ></textarea>
       </div>
 
+      <div class="section-title">細項列表</div>
+
       <!-- 已完成項目 -->
-      <div class="form-group full">
+      <div class="form-group">
         <label for="completed">
           已完成項目
           <span class="hint">（每行一項，將自動轉為條列）</span>
@@ -301,7 +347,7 @@
       </div>
 
       <!-- 進行中項目與預計完成時間 -->
-      <div class="form-group full">
+      <div class="form-group">
         <label for="inProgress">
           進行中項目與預計完成時間
           <span class="hint">（每行一項，可加入預估完成時間）</span>
@@ -314,7 +360,7 @@
       </div>
 
       <!-- 下一步計畫 / 待客戶確認事項 -->
-      <div class="form-group full">
+      <div class="form-group">
         <label for="nextSteps">
           下一步計畫 / 待客戶確認事項
           <span class="hint">（每行一項）</span>
@@ -325,6 +371,8 @@
 - 請提供正式上線前操作教育訓練的時程偏好與參考內容"
         ></textarea>
       </div>
+
+      <div class="section-title">結尾資訊</div>
 
       <!-- 發信人名稱 -->
       <div class="form-group">
@@ -352,11 +400,13 @@
         />
       </div>
 
+      <div class="section-title">原始草稿（選填）</div>
+
       <!-- 可貼上原始草稿：選擇性使用 -->
-      <div class="form-group full">
+      <div class="form-group">
         <label for="rawDraft">
-          原始專案內容 / 草稿（選填）
-          <span class="hint">（若有較雜的筆記，可貼在此區，PMail 會將其集中放在進度摘要中）</span>
+          原始專案內容 / 草稿
+          <span class="hint">（可貼雜記，PMail 會整理進摘要中）</span>
         </label>
         <textarea
           id="rawDraft"
@@ -365,7 +415,7 @@
       </div>
     </div>
 
-    <!-- ===== 動作按鈕 ===== -->
+    <!-- ===== 動作按鈕（Mobile 友善按鈕區） ===== -->
     <div class="actions">
       <button class="primary" id="generateBtn">
         🚀 產生 Email
@@ -397,10 +447,12 @@
         <div class="copy-hint">
           ⌨️ 小提醒：可直接複製貼上到 Outlook / Gmail 再做微調
         </div>
-        <span class="status-text" id="copyStatus">已複製到剪貼簿</span>
-        <button class="secondary" id="copyBtn">
-          📋 複製內文
-        </button>
+        <div class="copy-btn-row">
+          <span class="status-text" id="copyStatus">已複製到剪貼簿</span>
+          <button class="secondary" id="copyBtn">
+            📋 複製內文
+          </button>
+        </div>
       </div>
     </div>
   </div>
@@ -505,7 +557,7 @@
 
       // 問候語
       lines.push(`${safeClientName}您好：`);
-      lines.push(""); // 空行
+      lines.push("");
 
       // 開頭說明
       lines.push(
@@ -553,9 +605,9 @@
       // 結尾感謝語
       lines.push(safeClosing);
       lines.push("");
-      lines.push(`此致`);
+      lines.push("此致");
       lines.push("");
-      lines.push(`敬祝 順心`);
+      lines.push("敬祝 順心");
       lines.push("");
       lines.push(safeSender);
 
@@ -576,11 +628,9 @@
       const closing = closingInput.value;
       const rawDraft = rawDraftInput.value;
 
-      // 主旨
       const subject = buildSubject(projectName);
       outputSubject.textContent = subject;
 
-      // 內文
       const body = buildEmailBody({
         projectName,
         clientName,
@@ -593,7 +643,6 @@
         rawDraft,
       });
 
-      // 把產生的文字放到輸出區（使用 pre-wrap 顯示換行）
       outputBody.textContent = body;
     }
 
