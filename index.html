@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <title>PMail - PM 發信小幫手</title>
+
+  <style>
+    /* ===== 基本版型設定 ===== */
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+        "Noto Sans TC", "Microsoft JhengHei", sans-serif;
+      background: #f5f7fb;
+      color: #333;
+    }
+
+    .app-container {
+      max-width: 960px;
+      margin: 40px auto;
+      padding: 24px;
+      background: #ffffff;
+      border-radius: 16px;
+      box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
+    }
+
+    h1 {
+      margin: 0 0 4px;
+      font-size: 28px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      color: #1f2933;
+    }
+
+    .subtitle {
+      margin-bottom: 24px;
+      color: #6b7280;
+      font-size: 14px;
+    }
+
+    /* ===== 表單區塊 ===== */
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px 24px;
+      margin-bottom: 24px;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .form-group.full {
+      grid-column: 1 / -1; /* 佔滿整列 */
+    }
+
+    label {
+      font-size: 13px;
+      font-weight: 600;
+      color: #374151;
+    }
+
+    label span.hint {
+      font-weight: 400;
+      font-size: 11px;
+      color: #9ca3af;
+      margin-left: 4px;
+    }
+
+    input[type="text"],
+    textarea {
+      border-radius: 8px;
+      border: 1px solid #d1d5db;
+      padding: 8px 10px;
+      font-size: 13px;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
+      font-family: inherit;
+      resize: vertical;
+      min-height: 38px;
+    }
+
+    textarea {
+      min-height: 80px;
+      line-height: 1.5;
+    }
+
+    input[type="text"]:focus,
+    textarea:focus {
+      outline: none;
+      border-color: #2563eb;
+      box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.15);
+    }
+
+    input::placeholder,
+    textarea::placeholder {
+      color: #9ca3af;
+      font-size: 12px;
+    }
+
+    /* ===== 按鈕區 ===== */
+    .actions {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+
+    button {
+      border: none;
+      border-radius: 999px;
+      padding: 10px 18px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: transform 0.08s ease, box-shadow 0.08s ease,
+        background-color 0.12s ease;
+    }
+
+    button.primary {
+      background: #2563eb;
+      color: #ffffff;
+      box-shadow: 0 6px 16px rgba(37, 99, 235, 0.25);
+    }
+
+    button.primary:hover {
+      background: #1d4ed8;
+      transform: translateY(-1px);
+      box-shadow: 0 10px 24px rgba(37, 99, 235, 0.28);
+    }
+
+    button.secondary {
+      background: #e5e7eb;
+      color: #374151;
+    }
+
+    button.secondary:hover {
+      background: #d1d5db;
+    }
+
+    button:active {
+      transform: translateY(0);
+      box-shadow: none;
+    }
+
+    /* ===== 輸出區塊 ===== */
+    .output-card {
+      border-radius: 14px;
+      border: 1px solid #e5e7eb;
+      background: #f9fafb;
+      padding: 16px 16px 20px;
+    }
+
+    .output-header {
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 8px;
+      color: #111827;
+    }
+
+    .output-subject {
+      font-family: "SFMono-Regular", ui-monospace, Menlo, Monaco, Consolas,
+        "Liberation Mono", "Courier New", monospace;
+      font-size: 12px;
+      padding: 6px 8px;
+      border-radius: 8px;
+      background: #111827;
+      color: #f9fafb;
+      overflow-x: auto;
+      white-space: nowrap;
+      margin-bottom: 12px;
+    }
+
+    .output-body {
+      white-space: pre-wrap; /* 讓 \n 正確換行 */
+      font-size: 13px;
+      line-height: 1.6;
+      background: #ffffff;
+      border-radius: 10px;
+      padding: 12px 14px;
+      border: 1px solid #e5e7eb;
+      max-height: 420px;
+      overflow-y: auto;
+    }
+
+    .output-empty {
+      font-size: 12px;
+      color: #9ca3af;
+      font-style: italic;
+    }
+
+    .output-toolbar {
+      display: flex;
+      justify-content: flex-end;
+      margin-top: 10px;
+    }
+
+    .copy-hint {
+      font-size: 11px;
+      color: #6b7280;
+      margin-right: auto;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .status-text {
+      font-size: 11px;
+      color: #16a34a;
+      opacity: 0;
+      transition: opacity 0.2s ease;
+    }
+
+    .status-text.visible {
+      opacity: 1;
+    }
+
+    /* ===== RWD 調整 ===== */
+    @media (max-width: 768px) {
+      .app-container {
+        margin: 16px;
+        padding: 16px;
+      }
+
+      .form-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="app-container">
+    <h1>PMail</h1>
+    <div class="subtitle">PM 發信小幫手｜一鍵生成專業、條理清晰的專案進度回報 Email</div>
+
+    <!-- ===== 輸入區：基本資訊與專案內容 ===== -->
+    <div class="form-grid">
+      <!-- 專案名稱 -->
+      <div class="form-group">
+        <label for="projectName">
+          專案名稱
+          <span class="hint">（例如：企業內部系統優化專案）</span>
+        </label>
+        <input
+          type="text"
+          id="projectName"
+          placeholder="請輸入專案名稱"
+        />
+      </div>
+
+      <!-- 客戶稱呼 -->
+      <div class="form-group">
+        <label for="clientName">
+          客戶稱呼
+          <span class="hint">（例如：ABC 科技專案團隊、王先生）</span>
+        </label>
+        <input
+          type="text"
+          id="clientName"
+          placeholder="例如：ABC 科技專案團隊"
+        />
+      </div>
+
+      <!-- 本週進度摘要 -->
+      <div class="form-group full">
+        <label for="summary">
+          專案進度摘要
+          <span class="hint">（一至兩段，說明整體狀態）</span>
+        </label>
+        <textarea
+          id="summary"
+          placeholder="例如：本週整體進度如期進行，已完成核心功能開發與介面調整，目前已進入系統測試階段。"
+        ></textarea>
+      </div>
+
+      <!-- 已完成項目 -->
+      <div class="form-group full">
+        <label for="completed">
+          已完成項目
+          <span class="hint">（每行一項，將自動轉為條列）</span>
+        </label>
+        <textarea
+          id="completed"
+          placeholder="- 完成核心模組需求確認與欄位定義
+- 完成主要介面設計與文案定稿
+- 完成與第三方服務之 API 測試驗證"
+        ></textarea>
+      </div>
+
+      <!-- 進行中項目與預計完成時間 -->
+      <div class="form-group full">
+        <label for="inProgress">
+          進行中項目與預計完成時間
+          <span class="hint">（每行一項，可加入預估完成時間）</span>
+        </label>
+        <textarea
+          id="inProgress"
+          placeholder="- UAT 測試（預計 12/15 前完成）
+- 系統整合測試與性能驗證（預計 12/18 前完成）"
+        ></textarea>
+      </div>
+
+      <!-- 下一步計畫 / 待客戶確認事項 -->
+      <div class="form-group full">
+        <label for="nextSteps">
+          下一步計畫 / 待客戶確認事項
+          <span class="hint">（每行一項）</span>
+        </label>
+        <textarea
+          id="nextSteps"
+          placeholder="- 請協助確認 UAT 測試時段與參與成員名單
+- 請提供正式上線前操作教育訓練的時程偏好與參考內容"
+        ></textarea>
+      </div>
+
+      <!-- 發信人名稱 -->
+      <div class="form-group">
+        <label for="senderName">
+          發信人名稱
+          <span class="hint">（結尾簽名使用）</span>
+        </label>
+        <input
+          type="text"
+          id="senderName"
+          placeholder="例如：專案經理 David"
+        />
+      </div>
+
+      <!-- 結尾問候語 -->
+      <div class="form-group">
+        <label for="closing">
+          結尾問候語
+          <span class="hint">（可自行調整）</span>
+        </label>
+        <input
+          type="text"
+          id="closing"
+          placeholder="例如：若有任何問題，歡迎隨時與我聯繫，謝謝。"
+        />
+      </div>
+
+      <!-- 可貼上原始草稿：選擇性使用 -->
+      <div class="form-group full">
+        <label for="rawDraft">
+          原始專案內容 / 草稿（選填）
+          <span class="hint">（若有較雜的筆記，可貼在此區，PMail 會將其集中放在進度摘要中）</span>
+        </label>
+        <textarea
+          id="rawDraft"
+          placeholder="可貼上你原本寫給自己的備忘、需求彙整或簡短草稿，系統會將內容整理進信件中。"
+        ></textarea>
+      </div>
+    </div>
+
+    <!-- ===== 動作按鈕 ===== -->
+    <div class="actions">
+      <button class="primary" id="generateBtn">
+        🚀 產生 Email
+      </button>
+      <button class="secondary" id="resetBtn">
+        🧹 清空欄位
+      </button>
+    </div>
+
+    <!-- ===== 輸出結果區：Email 主旨與內文 ===== -->
+    <div class="output-card">
+      <div class="output-header">輸出結果（Email 樣式）</div>
+
+      <!-- 主旨 -->
+      <div class="output-subject" id="outputSubject">
+        （請先點選「產生 Email」）
+      </div>
+
+      <!-- 內文 -->
+      <div class="output-body" id="outputBody">
+        <span class="output-empty">
+          這裡將顯示 PMail 為你產生的專案進度回報信。<br />
+          內容會包含：主旨、問候語、專案進度摘要、已完成項目、進行中項目與預計完成時間、下一步計畫／待客戶確認事項以及結尾感謝語。
+        </span>
+      </div>
+
+      <!-- 複製工具列 -->
+      <div class="output-toolbar">
+        <div class="copy-hint">
+          ⌨️ 小提醒：可直接複製貼上到 Outlook / Gmail 再做微調
+        </div>
+        <span class="status-text" id="copyStatus">已複製到剪貼簿</span>
+        <button class="secondary" id="copyBtn">
+          📋 複製內文
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ===== 取得 DOM 元素 =====
+    const projectNameInput = document.getElementById("projectName");
+    const clientNameInput = document.getElementById("clientName");
+    const summaryInput = document.getElementById("summary");
+    const completedInput = document.getElementById("completed");
+    const inProgressInput = document.getElementById("inProgress");
+    const nextStepsInput = document.getElementById("nextSteps");
+    const senderNameInput = document.getElementById("senderName");
+    const closingInput = document.getElementById("closing");
+    const rawDraftInput = document.getElementById("rawDraft");
+
+    const generateBtn = document.getElementById("generateBtn");
+    const resetBtn = document.getElementById("resetBtn");
+    const copyBtn = document.getElementById("copyBtn");
+
+    const outputSubject = document.getElementById("outputSubject");
+    const outputBody = document.getElementById("outputBody");
+    const copyStatus = document.getElementById("copyStatus");
+
+    /**
+     * 將多行文字轉換成條列字串
+     * 每行會自動加上「．」開頭，並忽略空白行
+     */
+    function convertToBulletLines(text) {
+      if (!text) return "";
+      return text
+        .split("\n")
+        .map((line) => line.trim())
+        .filter((line) => line.length > 0)
+        .map((line) => "．" + line)
+        .join("\n");
+    }
+
+    /**
+     * 取得今日日期字串（YYYY/MM/DD）
+     */
+    function getTodayString() {
+      const now = new Date();
+      const y = now.getFullYear();
+      const m = String(now.getMonth() + 1).padStart(2, "0");
+      const d = String(now.getDate()).padStart(2, "0");
+      return `${y}/${m}/${d}`;
+    }
+
+    /**
+     * 產生 Email 主旨
+     */
+    function buildSubject(projectName) {
+      const today = getTodayString();
+      const name = projectName ? projectName.trim() : "專案";
+      return `【專案進度更新】${name} - 截至 ${today}`;
+    }
+
+    /**
+     * 產生 Email 內文
+     * 符合：主旨、問候語、專案進度摘要、已完成項目、
+     *       進行中項目與預計完成時間、下一步計畫／待客戶確認事項、結尾感謝語
+     */
+    function buildEmailBody({
+      projectName,
+      clientName,
+      summary,
+      completed,
+      inProgress,
+      nextSteps,
+      senderName,
+      closing,
+      rawDraft,
+    }) {
+      const today = getTodayString();
+
+      const safeProjectName = projectName.trim() || "本專案";
+      const safeClientName = clientName.trim() || "貴團隊";
+      const safeSender = senderName.trim() || "專案負責人";
+      const safeClosing =
+        closing.trim() || "若有任何問題，歡迎隨時與我聯繫，謝謝。";
+
+      // 若沒有填摘要，但有貼草稿，就把草稿當成摘要補上
+      let summaryContent = summary.trim();
+      if (!summaryContent && rawDraft.trim()) {
+        summaryContent =
+          "以下為本週專案重點說明，依據您提供之內容整理如下：" +
+          "\n" +
+          rawDraft.trim();
+      } else if (summaryContent && rawDraft.trim()) {
+        // 若兩者都有，則在摘要後面附註草稿整理
+        summaryContent +=
+          "\n\n補充說明（依據內部草稿整理）：\n" + rawDraft.trim();
+      }
+
+      const bulletCompleted = convertToBulletLines(completed);
+      const bulletInProgress = convertToBulletLines(inProgress);
+      const bulletNextSteps = convertToBulletLines(nextSteps);
+
+      // ---- Email 內文結構 ----
+      const lines = [];
+
+      // 問候語
+      lines.push(`${safeClientName}您好：`);
+      lines.push(""); // 空行
+
+      // 開頭說明
+      lines.push(
+        `這封信主要向您回報「${safeProjectName}」截至 ${today} 的專案進度，以下為本週重點摘要與後續規劃說明，供您參考。`
+      );
+      lines.push("");
+
+      // 專案進度摘要
+      lines.push("一、專案進度摘要");
+      lines.push(
+        summaryContent ||
+          "本週專案整體進度穩定推進，相關項目均依原訂計畫進行中。"
+      );
+      lines.push("");
+
+      // 已完成項目
+      lines.push("二、已完成項目");
+      if (bulletCompleted) {
+        lines.push(bulletCompleted);
+      } else {
+        lines.push("．目前已完成本階段預定之主要規劃與設定項目。");
+      }
+      lines.push("");
+
+      // 進行中項目與預計完成時間
+      lines.push("三、進行中項目與預計完成時間");
+      if (bulletInProgress) {
+        lines.push(bulletInProgress);
+      } else {
+        lines.push(
+          "．相關開發與測試作業正依時程推進，若有時程調整會再第一時間與您說明。"
+        );
+      }
+      lines.push("");
+
+      // 下一步計畫 / 待客戶確認事項
+      lines.push("四、下一步計畫 / 待客戶確認事項");
+      if (bulletNextSteps) {
+        lines.push(bulletNextSteps);
+      } else {
+        lines.push("．後續將依既定時程安排正式上線前測試與教育訓練事宜。");
+      }
+      lines.push("");
+
+      // 結尾感謝語
+      lines.push(safeClosing);
+      lines.push("");
+      lines.push(`此致`);
+      lines.push("");
+      lines.push(`敬祝 順心`);
+      lines.push("");
+      lines.push(safeSender);
+
+      return lines.join("\n");
+    }
+
+    /**
+     * 生成 Email，更新畫面
+     */
+    function generateEmail() {
+      const projectName = projectNameInput.value;
+      const clientName = clientNameInput.value;
+      const summary = summaryInput.value;
+      const completed = completedInput.value;
+      const inProgress = inProgressInput.value;
+      const nextSteps = nextStepsInput.value;
+      const senderName = senderNameInput.value;
+      const closing = closingInput.value;
+      const rawDraft = rawDraftInput.value;
+
+      // 主旨
+      const subject = buildSubject(projectName);
+      outputSubject.textContent = subject;
+
+      // 內文
+      const body = buildEmailBody({
+        projectName,
+        clientName,
+        summary,
+        completed,
+        inProgress,
+        nextSteps,
+        senderName,
+        closing,
+        rawDraft,
+      });
+
+      // 把產生的文字放到輸出區（使用 pre-wrap 顯示換行）
+      outputBody.textContent = body;
+    }
+
+    /**
+     * 清空所有輸入與輸出
+     */
+    function resetAll() {
+      projectNameInput.value = "";
+      clientNameInput.value = "";
+      summaryInput.value = "";
+      completedInput.value = "";
+      inProgressInput.value = "";
+      nextStepsInput.value = "";
+      senderNameInput.value = "";
+      closingInput.value = "";
+      rawDraftInput.value = "";
+
+      outputSubject.textContent = "（請先點選「產生 Email」）";
+      outputBody.innerHTML =
+        '<span class="output-empty">這裡將顯示 PMail 為你產生的專案進度回報信。<br />內容會包含：主旨、問候語、專案進度摘要、已完成項目、進行中項目與預計完成時間、下一步計畫／待客戶確認事項以及結尾感謝語。</span>';
+    }
+
+    /**
+     * 複製 Email 內文到剪貼簿
+     */
+    async function copyBodyToClipboard() {
+      const text = outputBody.textContent.trim();
+      if (!text) return;
+
+      try {
+        await navigator.clipboard.writeText(text);
+        copyStatus.classList.add("visible");
+        setTimeout(() => {
+          copyStatus.classList.remove("visible");
+        }, 1500);
+      } catch (e) {
+        alert("複製失敗，請手動選取後使用 Ctrl+C / Cmd+C 複製。");
+      }
+    }
+
+    // ===== 綁定事件 =====
+    generateBtn.addEventListener("click", generateEmail);
+    resetBtn.addEventListener("click", resetAll);
+    copyBtn.addEventListener("click", copyBodyToClipboard);
+  </script>
+</body>
+</html>
